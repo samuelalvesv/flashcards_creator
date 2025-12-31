@@ -17,9 +17,9 @@ class ProcessingOrchestrator:
         for d in [self.download_dir, self.segments_dir, self.results_dir]:
             os.makedirs(d, exist_ok=True)
 
-    async def process_youtube_link(self, youtube_url: str) -> str:
+    async def process_youtube_link(self, youtube_url: str) -> tuple[str, int]:
         """
-        Executa o fluxo completo e retorna o caminho do arquivo ZIP final.
+        Executa o fluxo completo e retorna o caminho do arquivo ZIP final e a quantidade de decks.
         """
         # 1. Download do YouTube
         print(f"Baixando vídeo: {youtube_url}")
@@ -50,7 +50,8 @@ class ProcessingOrchestrator:
         # shutil.rmtree(self.download_dir)
         # Manter arquivos temporários por enquanto para debug
 
-        return final_zip_path
+        deck_count = len(apkg_files)
+        return final_zip_path, deck_count
 
     async def _process_segment(self, video_path: str) -> str:
         """
@@ -62,7 +63,7 @@ class ProcessingOrchestrator:
 
             # Polling
             while True:
-                await asyncio.sleep(5)  # Espera 5s entre checagens
+                await asyncio.sleep(2)  # Espera 2s entre checagens conforme solicitado
                 status_data = await self.anki_client.check_status(task_id)
                 status = status_data.get("status")
 
@@ -81,11 +82,17 @@ class ProcessingOrchestrator:
                         f.write(content)
                     return output_path
 
-                elif status == "FAILURE" or status == "ERROR":  # Verificar status exato de falha
+                elif status == "RUNNING":
+                    progress = status_data.get("progress", 0)
+                    step = status_data.get("current_task", "processing")
+                    print(f"Task {task_id}: {status} - {step} ({progress}%)")
+                    continue
+
+                elif status == "FAILURE" or status == "ERROR":
                     print(f"Falha no processamento do segmento {video_path}: {status_data}")
                     raise Exception(f"Task failed: {status}")
 
-                # Se ainda estiver rodando (PENDING, PROCESSING, etc), continua o loop
+                # Outros status (PENDING, etc)
                 print(f"Task {task_id} status: {status}")
 
         except Exception as e:

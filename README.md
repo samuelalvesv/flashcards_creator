@@ -14,7 +14,7 @@ Backend em FastAPI para automatizar a criação de flashcards Anki a partir de v
 
 ### 1. Clonar o repositório
 ```bash
-git clone <seu-repo>
+git clone https://github.com/samuelalvesv/flashcards_creator
 cd flashcards_creator
 ```
 
@@ -56,6 +56,10 @@ Para rodar o servidor de desenvolvimento:
 uvicorn app.main:app --reload
 ```
 O servidor estará rodando em `http://localhost:8000`.
+
+## Documentação Interativa (Swagger UI)
+
+Acesse `http://localhost:8000/docs` para ver a documentação interativa da API, onde você pode testar os endpoints diretamente pelo navegador.
 
 ## Uso da API
 

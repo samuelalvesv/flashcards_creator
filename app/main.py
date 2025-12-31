@@ -11,9 +11,9 @@ app = FastAPI(
 app.include_router(api_router, prefix="/api")
 
 
-@app.get("/health")
+@app.get("/")
 def health_check():
-    return {"status": "ok"}
+    return {"status": "ok", "service": "Flashcards Creator API"}
 
 
 if __name__ == "__main__":
