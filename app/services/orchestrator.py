@@ -1,5 +1,6 @@
 import asyncio
 import os
+import shutil
 import zipfile
 
 from app.services.anki import VideoAnkiClient
@@ -46,9 +47,24 @@ class ProcessingOrchestrator:
                 if apkg and os.path.exists(apkg):
                     zipf.write(apkg, os.path.basename(apkg))
 
-        # Limpeza (opcional, pode ser movido para background task depois)
-        # shutil.rmtree(self.download_dir)
-        # Manter arquivos temporários por enquanto para debug
+        # Limpeza
+        # Remove arquivos .apkg individuais
+        for apkg in apkg_files:
+            if apkg and os.path.exists(apkg):
+                try:
+                    os.remove(apkg)
+                except OSError as e:
+                    print(f"Erro ao remover {apkg}: {e}")
+
+        # Remove diretórios de download e segmentos
+        for d in [self.download_dir, self.segments_dir]:
+            if os.path.exists(d):
+                try:
+                    shutil.rmtree(d)
+                except OSError as e:
+                    print(f"Erro ao remover diretório {d}: {e}")
+            # Recria os diretórios para o próximo uso
+            os.makedirs(d, exist_ok=True)
 
         deck_count = len(apkg_files)
         return final_zip_path, deck_count
