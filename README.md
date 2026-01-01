@@ -1,14 +1,14 @@
 # Flashcards Creator Backend
 
-Backend em FastAPI para automatizar a criação de flashcards Anki a partir de vídeos do YouTube. O sistema baixa o vídeo, divide em segmentos e interage com o serviço VideoAnki.
+Backend em FastAPI para automatizar a criação de flashcards Anki a partir de vídeos do YouTube. O sistema baixa o vídeo, divide em segmentos, interage com o serviço VideoAnki e limpa automaticamente os arquivos temporários após o processamento.
 
 ## Pré-requisitos
 
 - **Python 3.10+** instalado.
-- **FFmpeg** instalado e acessível no PATH do sistema.
+- **Python 3.10+** instalado.
+- **FFmpeg** (Opcional, mas recomendado): O projeto foi ajustado para funcionar sem ele, mas ter o FFmpeg permite melhor qualidade de download em alguns casos.
     - Mac: `brew install ffmpeg`
     - Linux: `sudo apt install ffmpeg`
-    - Windows: Baixar do site oficial e adicionar ao PATH.
 
 ## Instalação e Configuração
 
@@ -66,13 +66,26 @@ Acesse `http://localhost:8000/docs` para ver a documentação interativa da API,
 ### Gerar Deck
 **Endpoint**: `POST /api/generate-deck`
 
-**Exemplo de requisição (cURL):**
+**Exemplo de requisição:**
 ```bash
 curl -X POST "http://localhost:8000/api/generate-deck" \
      -H "Content-Type: application/json" \
-     -d '{"youtube_url": "https://youtu.be/SEU_VIDEO_AQUI"}' \
-     --output deck_final.zip
+     -d '{"youtube_url": "https://youtu.be/SEU_VIDEO_AQUI"}'
 ```
+
+**Resposta:**
+O endpoint retorna um JSON com a URL de download. O arquivo **não** é baixado diretamente nesta chamada.
+```json
+{
+  "download_url": "/api/download/deck_NOME_DO_VIDEO.zip",
+  "deck_count": 5,
+  "zip_filename": "deck_NOME_DO_VIDEO.zip"
+}
+```
+
+### Baixar Arquivo
+**Endpoint**: `GET /api/download/{filename}`
+Use a URL retornada no passo anterior para baixar o arquivo ZIP final.
 
 ## Desenvolvimento
 

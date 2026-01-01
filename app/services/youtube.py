@@ -12,7 +12,7 @@ def download_youtube_video(url: str, output_dir: str = "downloads") -> str:
 
     # Configurações do yt-dlp
     ydl_opts = {
-        "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",  # Prefere MP4
+        "format": "best[ext=mp4]/best",
         "outtmpl": f"{output_dir}/%(title)s.%(ext)s",
         "noplaylist": True,
         "quiet": True,
